@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="default.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.0.3/chroma.min.js"></script>
   </head>
   <body>
     <div class="main">
@@ -16,19 +17,16 @@
 
         <p>
           <label># of Colors</label>
-          <input type="range" />
+          <input id="num_h" type="range" min="0" max="20" value="10" />
         </p>
 
         <p>
           <label># of Levels</label>
-          <input type="range" />
+          <input id="num_l" type="range" min="0" max="10" value="5" />
         </p>
 
         <h3>To do</h3>
         <ul>
-          <li>sliders that work</li>
-          <li>solid color orbs</li>
-          <li>tooltips with hex</li>
           <li>performant chroma slider?</li>
           <li>export to css</li>
           <li>acknowledgements</li>
@@ -36,7 +34,7 @@
 
         <p>
           <label>Chromacity</label>
-          <input type="range" />
+          <input id="num_c" type="range" value="0" />
         </p>
 
         <p>

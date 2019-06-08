@@ -1,4 +1,28 @@
-var w;
+var w, palData;
+
+
+function showColors() {
+  let swatches = document.getElementById('swatches');
+  swatches.innerHTML = '';
+  
+  let numH = document.getElementById('num_h').value;
+  let numL = document.getElementById('num_l').value;
+
+  for(i = 0; i < numL; i++) {
+    for(j = 0; j < numH; j++) {
+      var bob = document.createElement('div');
+      let l = Math.round((i * (100 / numL)) + ((100 / numL) / 2));
+      let h = Math.round((j * (360 / numH)) + ((360 / numH) / 2));
+      console.log(l, h);
+      let c = palData[l][h];
+      bob.style.background = c.hex;
+      //bob.style.background = chroma.lch(99-l, c.max, h).hex();
+      bob.title = c.hex;
+      bob.style.gridRow = i + 1;
+      swatches.appendChild(bob);
+    }
+  }
+}
 
 function startWorker() {
   if(typeof(Worker) !== "undefined") {
@@ -20,7 +44,7 @@ function startWorker() {
         
         event.data.data.forEach((item, l) => {
           item.forEach((c, h) => {
-            ctx.fillStyle = c;
+            ctx.fillStyle = c.hex;
             ctx.fillRect(h, l, 1, 1);
           });
         });
@@ -37,14 +61,8 @@ function startWorker() {
         swatches.id = 'swatches';
         document.getElementById('palette').appendChild(swatches);
 
-        for(i=0;i<5;i++) {
-          for(j=0;j<10;j++) {
-            var bob = document.createElement('div')
-            //bob.style.background = '#f00';
-            bob.style.gridRow = i;
-            swatches.appendChild(bob);
-          }
-        }
+        palData = event.data.data;
+        showColors();
         
       } else {
         //document.getElementById("result").innerHTML = event.data;
@@ -63,3 +81,6 @@ function stopWorker() {
 }
 
 startWorker();
+
+document.getElementById('num_h').addEventListener('change', showColors);
+document.getElementById('num_l').addEventListener('change', showColors);

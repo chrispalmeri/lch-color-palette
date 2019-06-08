@@ -64,7 +64,7 @@ out.forEach((item, l) => {
   item.forEach((c, h) => {
     // use the average chroma instead
     // or increase percentage
-    out[l][h] = chroma.lch(99-l, c.even, h).hex();
+    out[l][h].hex = chroma.lch(99-l, c.even, h).hex();
   });
 });
 
