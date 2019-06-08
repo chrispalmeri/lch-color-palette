@@ -60,7 +60,6 @@ function run() {
 
 let out = run();
 
-
 out.forEach((item, l) => {
   item.forEach((c, h) => {
     // use the average chroma instead
@@ -73,4 +72,3 @@ postMessage({
   success: true,
   data: out
 });
-
