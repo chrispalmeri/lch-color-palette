@@ -7,6 +7,7 @@ function showColors() {
   
   let numH = document.getElementById('num_h').value;
   let numL = document.getElementById('num_l').value;
+  let numC = document.getElementById('num_c').value;
 
   for(i = 0; i < numL; i++) {
     for(j = 0; j < numH; j++) {
@@ -15,9 +16,12 @@ function showColors() {
       let h = Math.round((j * (360 / numH)) + ((360 / numH) / 2));
       console.log(l, h);
       let c = palData[l][h];
-      bob.style.background = c.hex;
-      //bob.style.background = chroma.lch(99-l, c.max, h).hex();
-      bob.title = c.hex;
+
+      let adj = c.even + (c.max - c.even) * (numC / 10);
+      let col = chroma.lch(99-l, adj, h).hex();
+      bob.style.background = col;
+      bob.title = col;
+
       bob.style.gridRow = i + 1;
       swatches.appendChild(bob);
     }
@@ -28,7 +32,7 @@ function startWorker() {
   if(typeof(Worker) !== "undefined") {
     if(typeof(w) == "undefined") {
       w = new Worker("worker.js");
-      document.getElementById("result").innerHTML = 'loading';
+      //document.getElementById("result").innerHTML = 'loading';
     }
 
     w.onmessage = function(event) {
@@ -70,17 +74,18 @@ function startWorker() {
       }
     };
   } else {
-    document.getElementById("result").innerHTML = "Sorry, your browser does not support Web Workers...";
+    //document.getElementById("result").innerHTML = "Sorry, your browser does not support Web Workers...";
   }
 }
 
 function stopWorker() { 
   w.terminate();
   w = undefined;
-  document.getElementById("result").innerHTML = 'finished';
+  //document.getElementById("result").innerHTML = 'finished';
 }
 
 startWorker();
 
 document.getElementById('num_h').addEventListener('change', showColors);
 document.getElementById('num_l').addEventListener('change', showColors);
+document.getElementById('num_c').addEventListener('change', showColors);
