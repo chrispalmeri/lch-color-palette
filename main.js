@@ -1,5 +1,17 @@
 var w, palData;
 
+function copy(text) {
+  var input = document.createElement('input');
+  input.value = text;
+
+  document.body.appendChild(input);
+  input.focus();
+  input.select();
+
+  document.execCommand('copy');
+
+  document.body.removeChild(input);
+}
 
 function showColors() {
   let swatches = document.getElementById('swatches');
@@ -8,19 +20,27 @@ function showColors() {
   let numH = document.getElementById('num_h').value;
   let numL = document.getElementById('num_l').value;
   let numC = document.getElementById('num_c').value;
+  let offX = document.getElementById('off_x').value;
+  var shift = Math.round((offX / 10) * ((360 / numH) / 2));
 
   for(i = 0; i < numL; i++) {
     for(j = 0; j < numH; j++) {
       var bob = document.createElement('div');
       let l = Math.round((i * (100 / numL)) + ((100 / numL) / 2));
-      let h = Math.round((j * (360 / numH)) + ((360 / numH) / 2));
-      console.log(l, h);
-      let c = palData[l][h];
+      let h = Math.round((j * (360 / numH)) + ((360 / numH) / 2) + shift);
+      if(h < 1) {
+        h = h + 360
+      }
+      //console.log(l, h);
+      let c = palData[l-1][h-1];
 
       let adj = c.even + (c.max - c.even) * (numC / 10);
       let col = chroma.lch(99-l, adj, h).hex();
       bob.style.background = col;
       bob.title = col;
+      bob.addEventListener('click', () => {
+        copy(col);
+      });
 
       bob.style.gridRow = i + 1;
       swatches.appendChild(bob);
@@ -38,7 +58,7 @@ function startWorker() {
     w.onmessage = function(event) {
       if(event.data.success) {
         stopWorker();
-        console.log(event.data.data);
+        //console.log(event.data.data);
         
         // actually build the table
         var canvas = document.createElement('canvas');
@@ -89,3 +109,4 @@ startWorker();
 document.getElementById('num_h').addEventListener('change', showColors);
 document.getElementById('num_l').addEventListener('change', showColors);
 document.getElementById('num_c').addEventListener('change', showColors);
+document.getElementById('off_x').addEventListener('change', showColors);
