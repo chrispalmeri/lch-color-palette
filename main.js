@@ -1,17 +1,5 @@
 var myWorker, workerOutput; // nested array where indexes are lightness and hue, 100 long 360 wide
 
-function copy(text) {
-	var input = document.createElement('input');
-	input.value = text;
-	document.body.appendChild(input);
-
-	input.focus();
-	input.select();
-	document.execCommand('copy');
-
-	document.body.removeChild(input);
-}
-
 function showColors() {
 	let swatches = document.getElementById('swatches');
 	swatches.innerHTML = '';
@@ -42,7 +30,7 @@ function showColors() {
 			swatch.style.background = finalColor;
 			swatch.title = finalColor;
 			swatch.addEventListener('click', () => {
-				copy(finalColor);
+				navigator.clipboard.writeText(finalColor);
 			});
 			swatch.style.gridRow = levelIndex + 1;
 			swatches.appendChild(swatch);
