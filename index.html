@@ -1,54 +1,47 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <link rel="stylesheet" href="default.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.0.3/chroma.min.js"></script>
-  </head>
-  <body>
-    <div class="main">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" href="default.css" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.0.3/chroma.min.js"></script>
+	</head>
+	<body>
+		<div class="main">
+			<div id="palette">
+				<progress id="progress" value="0"></progress>
+			</div>
 
-      <div id="palette">
-        <progress id="progress" value="0"></progress>
-      </div>
+			<div class="controls">
+				<h2>LCH Color Palette</h2>
+				<p>
+					<label># of Colors</label>
+					<input id="num_h" type="range" min="0" max="20" value="10" />
+				</p>
+				<p>
+					<label># of Levels</label>
+					<input id="num_l" type="range" min="0" max="10" value="5" />
+				</p>
+				<p>
+					<label>% over Chroma</label>
+					<input id="num_c" type="range" min="0" max="10" value="0" />
+				</p>
+				<p>
+					<label>Hue Offset</label>
+					<input id="off_x" type="range" min="-10" max="10" value="0" />
+				</p>
+				<p>
+					Adjust from even clipping to individual clipping for chroma.
+				</p>
 
-      <div class="controls">
-        <h2>LCH Color Palette</h2>
+				<h3>To do</h3>
+				<ul>
+					<li>export to css</li>
+					<li>hide background</li>
+					<li>acknowledgements</li>
+				</ul>
+			</div>
 
-        <p>
-          <label># of Colors</label>
-          <input id="num_h" type="range" min="0" max="20" value="10" />
-        </p>
-
-        <p>
-          <label># of Levels</label>
-          <input id="num_l" type="range" min="0" max="10" value="5" />
-        </p>
-
-        <p>
-          <label>% over Chroma</label>
-          <input id="num_c" type="range" min="0" max="10" value="0" />
-        </p>
-
-        <p>
-          <label>Hue Offset</label>
-          <input id="off_x" type="range" min="-10" max="10" value="0" />
-        </p>
-
-        <p>
-          Adjust from even clipping to individual clipping for chroma.
-        </p>
-
-        <h3>To do</h3>
-        <ul>
-          <li>export to css</li>
-          <li>hide background</li>
-          <li>acknowledgements</li>
-        </ul>
-
-      </div>
-
-    </div>
-    <script src="main.js"></script>
-  </body>
+		</div>
+		<script src="main.js"></script>
+	</body>
 </html>

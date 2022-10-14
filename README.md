@@ -23,3 +23,10 @@ python3 -m http.server
 # If Python version returned above is 2.X
 python -m SimpleHTTPServer
 ```
+
+# new
+
+  * you don't need to generate every possible color
+  * probably don't even need to store clipping data
+  * should generate object first
+    * then display, and convert to css
