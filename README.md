@@ -8,6 +8,7 @@ https://chrispalmeri.github.io/lch-color-palette/
 
   * you probably don't need to generate every possible color with clipping data
   * definitley don't need to generate the background image if it isn't seen
+    * don't allow sliders to go to 0 then
   * should factor the logic out of `showColors()` into new function that returns an object
     * then show that, and separately convert to css
 
