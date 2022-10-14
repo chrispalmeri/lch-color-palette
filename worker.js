@@ -1,21 +1,21 @@
-importScripts('https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.0.3/chroma.min.js');
+importScripts('https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.0.3/chroma.min.js'); // FF has no 'import' still
 
-function maxChroma(l, h, min, max) {
+function maxChroma(lightness, hue, min, max) {
   let unclipped = min || 0;
   let clipped = max || 100;
   let options = clipped - unclipped;
 
   if(options > 1) {
-    let c = Math.round((clipped + unclipped) / 2);
-    let color = chroma.lch(99-l, c, h); // invert lightness
+    let testChroma = Math.round((clipped + unclipped) / 2);
+    let color = chroma.lch(99-lightness, testChroma, hue); // invert lightness
 
     if (color.clipped()) {
-      clipped = c;
+      clipped = testChroma;
     } else {
-      unclipped = c;
+      unclipped = testChroma;
     }
 
-    return maxChroma(l, h, unclipped, clipped);
+    return maxChroma(lightness, hue, unclipped, clipped);
   } else {
     return unclipped;
   }

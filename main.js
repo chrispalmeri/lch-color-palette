@@ -1,4 +1,4 @@
-var w, palData;
+var myWorker, workerOutput; // nested array where indexes are lightness and hue, 100 long 360 wide
 
 function copy(text) {
   var input = document.createElement('input');
@@ -17,45 +17,45 @@ function showColors() {
   let swatches = document.getElementById('swatches');
   swatches.innerHTML = '';
   
-  let numH = document.getElementById('num_h').value;
-  let numL = document.getElementById('num_l').value;
-  let numC = document.getElementById('num_c').value;
-  let offX = document.getElementById('off_x').value;
-  var shift = Math.round((offX / 10) * ((360 / numH) / 2));
+  let numberOfColors = document.getElementById('num_h').value; // 0 to 20
+  let numberOfLevels = document.getElementById('num_l').value; // 0 to 5
+  let percentOverChroma = document.getElementById('num_c').value; // 0 to 10
+  let hueOffset = document.getElementById('off_x').value; // -10 to 10
+  var shift = Math.round((hueOffset / 10) * ((360 / numberOfColors) / 2)); // convert hueOffset to edge extents at max
 
-  for(i = 0; i < numL; i++) {
-    for(j = 0; j < numH; j++) {
-      var bob = document.createElement('div');
-      let l = Math.round((i * (100 / numL)) + ((100 / numL) / 2));
-      let h = Math.round((j * (360 / numH)) + ((360 / numH) / 2) + shift);
-      if(h < 1) {
-        h = h + 360
+  for(let levelIndex = 0; levelIndex < numberOfLevels; levelIndex++) {
+    for(let colorIndex = 0; colorIndex < numberOfColors; colorIndex++) {
+      var swatch = document.createElement('div');
+      let lightness = Math.round((levelIndex * (100 / numberOfLevels)) + ((100 / numberOfLevels) / 2));
+      let hue = Math.round((colorIndex * (360 / numberOfColors)) + ((360 / numberOfColors) / 2) + shift);
+      if(hue < 1) {
+        hue = hue + 360
       }
       //console.log(l, h);
-      let c = palData[l-1][h-1];
+      let colorData = workerOutput[lightness-1][hue-1];
 
-      let adj = c.even + (c.max - c.even) * (numC / 10);
-      let col = chroma.lch(99-l, adj, h).hex();
-      bob.style.background = col;
-      bob.title = col;
-      bob.addEventListener('click', () => {
-        copy(col);
+      let adjustedChroma = colorData.even + (colorData.max - colorData.even) * (percentOverChroma / 10);
+      let finalColor = chroma.lch(99-lightness, adjustedChroma, hue).hex();
+      swatch.style.background = finalColor;
+      swatch.title = finalColor;
+      swatch.addEventListener('click', () => {
+        copy(finalColor);
       });
 
-      bob.style.gridRow = i + 1;
-      swatches.appendChild(bob);
+      swatch.style.gridRow = levelIndex + 1;
+      swatches.appendChild(swatch);
     }
   }
 }
 
 function startWorker() {
   if(typeof(Worker) !== "undefined") {
-    if(typeof(w) == "undefined") {
-      w = new Worker("worker.js");
+    if(typeof(myWorker) == "undefined") {
+      myWorker = new Worker("worker.js");
       //document.getElementById("result").innerHTML = 'loading';
     }
 
-    w.onmessage = function(event) {
+    myWorker.onmessage = function(event) {
       if(event.data.success) {
         stopWorker();
         //console.log(event.data.data);
@@ -73,19 +73,19 @@ function startWorker() {
           });
         });
         
-        var data = canvas.toDataURL();
+        var dataUrl = canvas.toDataURL();
         var myElement = document.getElementById('palette');
 
-        myElement.style.backgroundImage = 'url('+data+')';
+        myElement.style.backgroundImage = 'url('+dataUrl+')';
         
-        var kid = document.getElementById('progress');
-        kid.parentElement.removeChild(kid);
+        var progressBar = document.getElementById('progress');
+        progressBar.parentElement.removeChild(progressBar);
 
         var swatches = document.createElement('div')
         swatches.id = 'swatches';
         document.getElementById('palette').appendChild(swatches);
 
-        palData = event.data.data;
+        workerOutput = event.data.data;
         showColors();
         
       } else {
@@ -99,8 +99,8 @@ function startWorker() {
 }
 
 function stopWorker() { 
-  w.terminate();
-  w = undefined;
+  myWorker.terminate();
+  myWorker = undefined;
   //document.getElementById("result").innerHTML = 'finished';
 }
 
