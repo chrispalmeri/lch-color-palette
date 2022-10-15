@@ -26,10 +26,10 @@ function getColors(workerOutput, numberOfColors, numberOfLevels, percentOverChro
 
 	let shift = Math.round((hueOffset / 10) * ((360 / numberOfColors) / 2)); // convert hueOffset to edge extents at max
 
-	for(let levelIndex = 0; levelIndex < numberOfLevels; levelIndex++) {
-		colorArray[levelIndex] = [];
+	for(let colorIndex = 0; colorIndex < numberOfColors; colorIndex++) {
+		colorArray[colorIndex] = [];
 
-		for(let colorIndex = 0; colorIndex < numberOfColors; colorIndex++) {
+		for(let levelIndex = 0; levelIndex < numberOfLevels; levelIndex++) {
 			let lightness = Math.round((levelIndex * (100 / numberOfLevels)) + ((100 / numberOfLevels) / 2));
 			let hue = Math.round((colorIndex * (360 / numberOfColors)) + ((360 / numberOfColors) / 2) + shift);
 
@@ -42,7 +42,7 @@ function getColors(workerOutput, numberOfColors, numberOfLevels, percentOverChro
 			let adjustedChroma = maxData + (colorData.c - maxData) * (percentOverChroma / 10);
 			let finalColor = chroma.lch(lightness, adjustedChroma, hue).hex();
 
-			colorArray[levelIndex][colorIndex] = finalColor;
+			colorArray[colorIndex][levelIndex] = finalColor;
 		}
 	}
 

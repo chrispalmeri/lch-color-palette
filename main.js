@@ -6,17 +6,13 @@ function downloadCss(e) {
 	e.preventDefault();
 
 	let styleSheet = new CSSStyleSheet();
+	styleSheet.insertRule(':root {}'); // seems to work with empty properties
 
-	styleSheet.insertRule(':root { --black: #000; }');
-	styleSheet.cssRules[0].style.setProperty('--white', '#fff');
+	for(let colorIndex = 0; colorIndex < colorArray.length; colorIndex++) {
+		for(let levelIndex = 0; levelIndex < colorArray[colorIndex].length; levelIndex++) {
+			let finalColor = colorArray[colorIndex][levelIndex];
 
-	// would like to rearrange this and group by color
-
-	for(let levelIndex = 0; levelIndex < colorArray.length; levelIndex++) {
-		for(let colorIndex = 0; colorIndex < colorArray[levelIndex].length; colorIndex++) {
-			let finalColor = colorArray[levelIndex][colorIndex];
-
-			styleSheet.cssRules[0].style.setProperty(`--level${levelIndex}-color${colorIndex}`, finalColor);
+			styleSheet.cssRules[0].style.setProperty(`--color${colorIndex + 1}-${100 * (levelIndex + 1)}`, finalColor);
 		}
 	}
 
@@ -33,9 +29,9 @@ function showColors() {
 	let swatches = document.getElementById('swatches');
 	swatches.innerHTML = '';
 
-	for(let levelIndex = 0; levelIndex < colorArray.length; levelIndex++) {
-		for(let colorIndex = 0; colorIndex < colorArray[levelIndex].length; colorIndex++) {
-			let finalColor = colorArray[levelIndex][colorIndex];
+	for(let colorIndex = 0; colorIndex < colorArray.length; colorIndex++) {
+		for(let levelIndex = 0; levelIndex < colorArray[colorIndex].length; levelIndex++) {
+			let finalColor = colorArray[colorIndex][levelIndex];
 
 			var swatch = document.createElement('div');
 			swatch.style.background = finalColor;
@@ -44,6 +40,7 @@ function showColors() {
 				navigator.clipboard.writeText(finalColor);
 			});
 			swatch.style.gridRow = levelIndex + 1;
+			swatch.style.gridColumn = colorIndex + 1;
 			swatches.appendChild(swatch);
 		}
 	}
