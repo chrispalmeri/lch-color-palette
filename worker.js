@@ -46,6 +46,18 @@ function getColors(workerOutput, numberOfColors, numberOfLevels, percentOverChro
 		}
 	}
 
+	// add gray
+	colorArray.unshift([]);
+
+	for(let levelIndex = 0; levelIndex < numberOfLevels; levelIndex++) {
+		let lightness = Math.round((levelIndex * (100 / numberOfLevels)) + ((100 / numberOfLevels) / 2));
+		lightness = 99 - lightness; // this is what flips it
+
+		let finalColor = chroma.lch(lightness, 0, 0).hex(); // or change hue to blue
+
+		colorArray[0][levelIndex] = finalColor;
+	}
+
 	return colorArray;
 }
 
@@ -86,6 +98,7 @@ function run() {
 // the progress mask is immersion breaking
 // not really a fix, just keeping old behavior, by only doing it once
 // that should be the only thing sending progress updates, so no mask
+// if you stop this, still store max chroma, unless chroma slider changes
 let out = null;
 
 self.addEventListener("message", function(e) {
