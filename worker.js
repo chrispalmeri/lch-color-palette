@@ -7,7 +7,7 @@ function maxChroma(lightness, hue, min, max) {
 
 	if(options > 1) {
 		let testChroma = Math.round((clipped + unclipped) / 2);
-		let color = chroma.lch(lightness, testChroma, hue); // invert lightness
+		let color = chroma.lch(lightness, testChroma, hue);
 
 		if (color.clipped()) {
 			clipped = testChroma;
@@ -46,23 +46,20 @@ function run() {
 
 		progress = progress + 1;
 		postMessage(progress / 100);
-		//console.log(progress / 100);
 	}
 
-	return { palette: palette, even: even};
+	for (let i = 0; i < palette.length; i++) {
+		palette[i].hex = chroma.lch(palette[i].l, even[palette[i].l], palette[i].h).hex();
+	}
+
+	return { palette: palette, even: even };
 }
 
-// return a table of actual colors
+self.addEventListener("message", function(e) {
+	let out = run();
 
-let out = run();
-
-for (let i = 0; i < out.palette.length; i++) {
-	// use the average chroma instead
-	// or increase percentage
-	out.palette[i].hex = chroma.lch(out.palette[i].l, out.even[out.palette[i].l], out.palette[i].h).hex();
-}
-
-postMessage({
-	success: true,
-	data: out
+	postMessage({
+		success: true,
+		data: out
+	});
 });

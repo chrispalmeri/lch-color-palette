@@ -88,27 +88,28 @@ function showColors() {
 }
 
 function startWorker() {
-	if(typeof(myWorker) == "undefined") {
+	if(typeof(myWorker) === "undefined") {
 		myWorker = new Worker("worker.js");
 	}
 
 	myWorker.onmessage = function(event) {
+		var progressBar = document.getElementById('progress');
+
 		if(event.data.success) {
 			stopWorker();
 
-			var progressBar = document.getElementById('progress');
-			progressBar.parentElement.removeChild(progressBar);
-
-			var swatches = document.createElement('div')
-			swatches.id = 'swatches';
-			document.getElementById('palette').appendChild(swatches);
+			progressBar.parentElement.style.display = 'none';
+			progressBar.value = 0;
 
 			workerOutput = event.data.data;
 			getColors();
 		} else {
-			document.getElementById('progress').value = event.data;
+			progressBar.parentElement.style.display = 'flex';
+			progressBar.value = event.data;
 		}
 	};
+
+	myWorker.postMessage('work');
 }
 
 function stopWorker() { 
