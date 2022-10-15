@@ -22,8 +22,8 @@ function getColors() {
 				hue = hue + 360
 			}
 
-			let colorData = workerOutput.palette[(lightness-1)*(hue-1)];
-			let maxData = workerOutput.even[lightness-1];
+			let colorData = workerOutput.palette[(lightness - 1) * 360 + (hue - 1)];
+			let maxData = workerOutput.even[lightness - 1];
 
 			let adjustedChroma = maxData + (colorData.c - maxData) * (percentOverChroma / 10);
 			let finalColor = chroma.lch(99 - lightness, adjustedChroma, hue).hex(); // this is what  flips it

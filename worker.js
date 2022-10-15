@@ -33,7 +33,7 @@ function run() {
 		even[l] = 100;
 
 		for (let h = 0; h < colors.length; h++) {
-			let max =  maxChroma(l, h);
+			let max = maxChroma(l, h);
 			if(max < even[l]) {
 				even[l] = max;
 			}
