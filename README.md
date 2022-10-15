@@ -8,13 +8,6 @@ https://chrispalmeri.github.io/lch-color-palette/
 
   * you probably don't need to generate every possible color with clipping data
 
-previous list
-
-  * vertical slider would be nice
-     * or just space the top and bottom even instead of 1/2
-  * actually showing the offset moving on the screen would be nice
-     * non-issue/unfixable now that circles are hidden
-
 # local sever
 
 ```bash

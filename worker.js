@@ -83,8 +83,15 @@ function run() {
 	return { palette: palette, even: even };
 }
 
+// the progress mask is immersion breaking
+// not really a fix, just keeping old behavior, by only doing it once
+// that should be the only thing sending progress updates, so no mask
+let out = null;
+
 self.addEventListener("message", function(e) {
-	let out = run();
+	if(!out) {
+		out = run();
+	}
 
 	let calc = getColors(out, e.data.colors, e.data.levels, e.data.chroma, e.data.offset);
 

@@ -2,7 +2,9 @@ var myWorker;
 
 let colorArray = [];
 
-function buildCss() {
+function downloadCss(e) {
+	e.preventDefault();
+
 	let styleSheet = new CSSStyleSheet();
 
 	styleSheet.insertRule(':root { --black: #000; }');
@@ -18,13 +20,7 @@ function buildCss() {
 		}
 	}
 
-	return styleSheet.cssRules[0].cssText;
-}
-
-function downloadCss(e) {
-	e.preventDefault();
-
-	let cssText = buildCss();
+	let cssText = styleSheet.cssRules[0].cssText;
 	let cssFormatted = cssText.replace(/([;{])\s?/g, '$1\n\t').replace('\t}', '}\n');
 
 	let link = document.createElement("a");
@@ -56,24 +52,22 @@ function showColors() {
 function startWorker() {
 	if(typeof(myWorker) === "undefined") {
 		myWorker = new Worker("worker.js");
+
+		myWorker.onmessage = function(event) {
+			var progressBar = document.getElementById('progress');
+
+			if(event.data.success) {
+				progressBar.parentElement.style.display = 'none';
+				progressBar.value = 0;
+
+				colorArray = event.data.calc;
+				showColors();
+			} else {
+				progressBar.parentElement.style.display = 'flex';
+				progressBar.value = event.data;
+			}
+		};
 	}
-
-	myWorker.onmessage = function(event) {
-		var progressBar = document.getElementById('progress');
-
-		if(event.data.success) {
-			stopWorker();
-
-			progressBar.parentElement.style.display = 'none';
-			progressBar.value = 0;
-
-			colorArray = event.data.calc;
-			showColors();
-		} else {
-			progressBar.parentElement.style.display = 'flex';
-			progressBar.value = event.data;
-		}
-	};
 
 	myWorker.postMessage({
 		colors: document.getElementById('num_h').value,
@@ -82,14 +76,6 @@ function startWorker() {
 		offset: document.getElementById('off_x').value
 	});
 }
-
-function stopWorker() { 
-	myWorker.terminate();
-	myWorker = undefined;
-}
-
-// you should probably keep the worker alive
-// the progress mask is immersion breaking
 
 startWorker();
 
