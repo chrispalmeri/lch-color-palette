@@ -7,7 +7,7 @@ function maxChroma(lightness, hue, min, max) {
 
 	if(options > 1) {
 		let testChroma = Math.round((clipped + unclipped) / 2);
-		let color = chroma.lch(99-lightness, testChroma, hue); // invert lightness
+		let color = chroma.lch(lightness, testChroma, hue); // invert lightness
 
 		if (color.clipped()) {
 			clipped = testChroma;
@@ -59,7 +59,7 @@ let out = run();
 for (let i = 0; i < out.palette.length; i++) {
 	// use the average chroma instead
 	// or increase percentage
-	out.palette[i].hex = chroma.lch(99-out.palette[i].l, out.even[out.palette[i].l], out.palette[i].h).hex();
+	out.palette[i].hex = chroma.lch(out.palette[i].l, out.even[out.palette[i].l], out.palette[i].h).hex();
 }
 
 postMessage({

@@ -18,15 +18,15 @@ function getColors() {
 		for(let colorIndex = 0; colorIndex < numberOfColors; colorIndex++) {
 			let lightness = Math.round((levelIndex * (100 / numberOfLevels)) + ((100 / numberOfLevels) / 2));
 			let hue = Math.round((colorIndex * (360 / numberOfColors)) + ((360 / numberOfColors) / 2) + shift);
-			if(hue < 1) {
-				hue = hue + 360
-			}
 
-			let colorData = workerOutput.palette[(lightness - 1) * 360 + (hue - 1)];
-			let maxData = workerOutput.even[lightness - 1];
+			lightness = 99 - lightness; // this is what flips it
+
+			// these are weird, just to match current behavior
+			let colorData = workerOutput.palette[(lightness + 1) * 360 + (hue - 1)];
+			let maxData = workerOutput.even[lightness + 1];
 
 			let adjustedChroma = maxData + (colorData.c - maxData) * (percentOverChroma / 10);
-			let finalColor = chroma.lch(99 - lightness, adjustedChroma, hue).hex(); // this is what  flips it
+			let finalColor = chroma.lch(lightness, adjustedChroma, hue).hex();
 
 			colorArray[levelIndex][colorIndex] = finalColor;
 		}
