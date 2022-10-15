@@ -1,40 +1,6 @@
-var myWorker, workerOutput; // nested array where indexes are lightness and hue, 100 long 360 wide
+var myWorker;
 
 let colorArray = [];
-
-function getColors() {
-	colorArray = [];
-
-	let numberOfColors = document.getElementById('num_h').value; // 1 to 12
-	let numberOfLevels = document.getElementById('num_l').value; // 1 to 12
-	let percentOverChroma = document.getElementById('num_c').value; // 0 to 10
-	let hueOffset = document.getElementById('off_x').value; // -10 to 10
-
-	let shift = Math.round((hueOffset / 10) * ((360 / numberOfColors) / 2)); // convert hueOffset to edge extents at max
-
-	for(let levelIndex = 0; levelIndex < numberOfLevels; levelIndex++) {
-		colorArray[levelIndex] = [];
-
-		for(let colorIndex = 0; colorIndex < numberOfColors; colorIndex++) {
-			let lightness = Math.round((levelIndex * (100 / numberOfLevels)) + ((100 / numberOfLevels) / 2));
-			let hue = Math.round((colorIndex * (360 / numberOfColors)) + ((360 / numberOfColors) / 2) + shift);
-
-			lightness = 99 - lightness; // this is what flips it
-
-			// these are weird, just to match current behavior
-			let colorData = workerOutput.palette[(lightness + 1) * 360 + (hue - 1)];
-			let maxData = workerOutput.even[lightness + 1];
-
-			let adjustedChroma = maxData + (colorData.c - maxData) * (percentOverChroma / 10);
-			let finalColor = chroma.lch(lightness, adjustedChroma, hue).hex();
-
-			colorArray[levelIndex][colorIndex] = finalColor;
-		}
-	}
-
-	showColors();
-	buildCss();
-}
 
 function buildCss() {
 	let styleSheet = new CSSStyleSheet();
@@ -101,15 +67,20 @@ function startWorker() {
 			progressBar.parentElement.style.display = 'none';
 			progressBar.value = 0;
 
-			workerOutput = event.data.data;
-			getColors();
+			colorArray = event.data.calc;
+			showColors();
 		} else {
 			progressBar.parentElement.style.display = 'flex';
 			progressBar.value = event.data;
 		}
 	};
 
-	myWorker.postMessage('work');
+	myWorker.postMessage({
+		colors: document.getElementById('num_h').value,
+		levels: document.getElementById('num_l').value,
+		chroma: document.getElementById('num_c').value,
+		offset: document.getElementById('off_x').value
+	});
 }
 
 function stopWorker() { 
@@ -117,10 +88,13 @@ function stopWorker() {
 	myWorker = undefined;
 }
 
+// you should probably keep the worker alive
+// the progress mask is immersion breaking
+
 startWorker();
 
-document.getElementById('num_h').addEventListener('change', getColors);
-document.getElementById('num_l').addEventListener('change', getColors);
-document.getElementById('num_c').addEventListener('change', getColors);
-document.getElementById('off_x').addEventListener('change', getColors);
+document.getElementById('num_h').addEventListener('change', startWorker);
+document.getElementById('num_l').addEventListener('change', startWorker);
+document.getElementById('num_c').addEventListener('change', startWorker);
+document.getElementById('off_x').addEventListener('change', startWorker);
 document.getElementById('download').addEventListener('click', downloadCss);
