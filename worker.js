@@ -24,49 +24,43 @@ function maxChroma(lightness, hue, min, max) {
 function run() {
 	let progress = 0;
 
-	let palette = Array.from({length: 100}, () => {
-		return Array.from({length: 360}, () => {
-			return {};
-		});
-	});
+	let palette = [];
+	let even = [];
+	let shades = Array.from({length: 100}, (v, i) => i);
+	let colors = Array.from({length: 360}, (v, i) => i);
 
-	palette.forEach((item, l) => {
-		let even = 100;
+	for (let l = 0; l < shades.length; l++) {
+		even[l] = 100;
 
-		item.forEach((c, h) => {
+		for (let h = 0; h < colors.length; h++) {
 			let max =  maxChroma(l, h);
-			if(max < even) {
-				even = max;
+			if(max < even[l]) {
+				even[l] = max;
 			}
-			palette[l][h].max = max;
-		});
-
-		// save the max chroma per row
-		item.forEach((c, h) => {
-			palette[l][h].even = even;
-		});
-
-		even = 100;
+			palette.push({
+				l: l,
+				c: max,
+				h: h,
+			});
+		}
 
 		progress = progress + 1;
 		postMessage(progress / 100);
 		//console.log(progress / 100);
-	});
+	}
 
-	return palette;
+	return { palette: palette, even: even};
 }
 
 // return a table of actual colors
 
 let out = run();
 
-out.forEach((item, l) => {
-	item.forEach((c, h) => {
-		// use the average chroma instead
-		// or increase percentage
-		out[l][h].hex = chroma.lch(99-l, c.even, h).hex();
-	});
-});
+for (let i = 0; i < out.palette.length; i++) {
+	// use the average chroma instead
+	// or increase percentage
+	out.palette[i].hex = chroma.lch(99-out.palette[i].l, out.even[out.palette[i].l], out.palette[i].h).hex();
+}
 
 postMessage({
 	success: true,
