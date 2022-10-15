@@ -5,8 +5,8 @@ let colorArray = [];
 function getColors() {
 	colorArray = [];
 
-	let numberOfColors = document.getElementById('num_h').value; // 0 to 20
-	let numberOfLevels = document.getElementById('num_l').value; // 0 to 5
+	let numberOfColors = document.getElementById('num_h').value; // 1 to 12
+	let numberOfLevels = document.getElementById('num_l').value; // 1 to 12
 	let percentOverChroma = document.getElementById('num_c').value; // 0 to 10
 	let hueOffset = document.getElementById('off_x').value; // -10 to 10
 
@@ -31,7 +31,6 @@ function getColors() {
 		}
 	}
 
-	//return output;
 	showColors();
 	buildCss();
 }
@@ -88,57 +87,32 @@ function showColors() {
 }
 
 function startWorker() {
-	if(typeof(Worker) !== "undefined") {
-		if(typeof(myWorker) == "undefined") {
-			myWorker = new Worker("worker.js");
-			//document.getElementById("result").innerHTML = 'loading';
-		}
-
-		myWorker.onmessage = function(event) {
-			if(event.data.success) {
-				stopWorker();
-				//console.log(event.data.data);
-
-				// actually build the table
-				var canvas = document.createElement('canvas');
-				canvas.setAttribute('height', '100px');
-				canvas.setAttribute('width', '360px');
-				var ctx = canvas.getContext("2d");
-
-				event.data.data.forEach((item, l) => {
-					item.forEach((c, h) => {
-						ctx.fillStyle = c.hex;
-						ctx.fillRect(h, l, 1, 1);
-					});
-				});
-
-				var dataUrl = canvas.toDataURL();
-				var myElement = document.getElementById('palette');
-				myElement.style.backgroundImage = 'url('+dataUrl+')';
-
-				var progressBar = document.getElementById('progress');
-				progressBar.parentElement.removeChild(progressBar);
-
-				var swatches = document.createElement('div')
-				swatches.id = 'swatches';
-				document.getElementById('palette').appendChild(swatches);
-
-				workerOutput = event.data.data;
-				getColors();
-			} else {
-				//document.getElementById("result").innerHTML = event.data;
-				document.getElementById('progress').value = event.data;
-			}
-		};
-	} else {
-		//document.getElementById("result").innerHTML = "Sorry, your browser does not support Web Workers...";
+	if(typeof(myWorker) == "undefined") {
+		myWorker = new Worker("worker.js");
 	}
+
+	myWorker.onmessage = function(event) {
+		if(event.data.success) {
+			stopWorker();
+
+			var progressBar = document.getElementById('progress');
+			progressBar.parentElement.removeChild(progressBar);
+
+			var swatches = document.createElement('div')
+			swatches.id = 'swatches';
+			document.getElementById('palette').appendChild(swatches);
+
+			workerOutput = event.data.data;
+			getColors();
+		} else {
+			document.getElementById('progress').value = event.data;
+		}
+	};
 }
 
 function stopWorker() { 
 	myWorker.terminate();
 	myWorker = undefined;
-	//document.getElementById("result").innerHTML = 'finished';
 }
 
 startWorker();
