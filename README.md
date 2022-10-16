@@ -24,7 +24,6 @@ to old version, but should look similar visually, other than 1% brighter overall
   * ability to turn down chroma, or up more evenly ignoring clipping?
   * type module
   * favicon and stuff
-  * local copy of chroma.js
   * move to unrowdy and netlify if nice enough
 
 # local web sever

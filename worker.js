@@ -1,4 +1,4 @@
-importScripts('https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.0.3/chroma.min.js'); // FF has no 'import' still
+importScripts('vendor/chroma.js'); // FF has no 'import' still
 
 function maxChroma(lightness, hue, min, max) {
 	let unclipped = min || 0;
