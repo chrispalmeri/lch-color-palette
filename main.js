@@ -20,7 +20,7 @@ function downloadCss(e) {
 	let styleSheet = new CSSStyleSheet();
 	styleSheet.insertRule(':root {}');
 
-	for(let i = 0; i < workerData.colors.length; i++) {
+	for (let i = 0; i < workerData.colors.length; i++) {
 		let finalColor = workerData.colors[i].hex;
 		let levelIndex = i % workerData.config.levels;
 		let colorIndex = Math.floor(i / workerData.config.levels);
@@ -38,9 +38,9 @@ function downloadCss(e) {
 	comment += ' * offset: ' + workerData.config.offset + '\n';
 	comment += ' */\n\n';
 
-	let link = document.createElement("a");
-	link.setAttribute("href", "data:text/css;charset=utf-8," + encodeURIComponent(comment + cssFormatted));
-	link.setAttribute("download", "colors.css");
+	let link = document.createElement('a');
+	link.setAttribute('href', 'data:text/css;charset=utf-8,' + encodeURIComponent(comment + cssFormatted));
+	link.setAttribute('download', 'colors.css');
 	link.click();
 }
 
@@ -48,12 +48,12 @@ function showColors() {
 	let swatches = document.getElementById('swatches');
 	swatches.innerHTML = '';
 
-	for(let i = 0; i < workerData.colors.length; i++) {
+	for (let i = 0; i < workerData.colors.length; i++) {
 		let finalColor = workerData.colors[i].hex;
 		let levelIndex = i % workerData.config.levels;
 		let colorIndex = Math.floor(i / workerData.config.levels);
 
-		var swatch = document.createElement('div');
+		let swatch = document.createElement('div');
 		swatch.style.background = finalColor;
 		swatch.title = finalColor;
 		swatch.addEventListener('click', () => {
@@ -66,13 +66,13 @@ function showColors() {
 }
 
 function startWorker() {
-	if(typeof(myWorker) === "undefined") {
-		myWorker = new Worker("worker.js");
+	if (typeof myWorker === 'undefined') {
+		myWorker = new Worker('worker.js');
 
-		myWorker.onmessage = function(event) {
+		myWorker.addEventListener('message', function (event) {
 			workerData = event.data;
 			showColors();
-		};
+		});
 	}
 
 	myWorker.postMessage({

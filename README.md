@@ -20,6 +20,7 @@ to old version, but should look similar visually, other than 1% brighter overall
 
   * some kind of css color names matchup
   * horizontal swatch layout, with gaps, vertically scrollable?
+  * move sidebar to left side?
   * ability to turn down chroma, or up more evenly ignoring clipping?
   * type module
   * general metadata stuff
