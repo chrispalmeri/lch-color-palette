@@ -1,6 +1,4 @@
-var myWorker;
-
-let colorArray = [];
+let myWorker, colorArray;
 
 function downloadCss(e) {
 	e.preventDefault();
@@ -8,12 +6,12 @@ function downloadCss(e) {
 	let styleSheet = new CSSStyleSheet();
 	styleSheet.insertRule(':root {}'); // seems to work with empty properties
 
-	for(let colorIndex = 0; colorIndex < colorArray.length; colorIndex++) {
-		for(let levelIndex = 0; levelIndex < colorArray[colorIndex].length; levelIndex++) {
-			let finalColor = colorArray[colorIndex][levelIndex];
+	for(let i = 0; i < colorArray.length; i++) {
+		let finalColor = colorArray[i].hex;
+		let levelIndex = i % document.getElementById('num_l').value;
+		let colorIndex = Math.floor(i / document.getElementById('num_l').value);
 
-			styleSheet.cssRules[0].style.setProperty(`--color${colorIndex}-${100 * (levelIndex + 1)}`, finalColor);
-		}
+		styleSheet.cssRules[0].style.setProperty(`--color${colorIndex}-${100 * (levelIndex + 1)}`, finalColor);
 	}
 
 	let cssText = styleSheet.cssRules[0].cssText;
@@ -29,20 +27,20 @@ function showColors() {
 	let swatches = document.getElementById('swatches');
 	swatches.innerHTML = '';
 
-	for(let colorIndex = 0; colorIndex < colorArray.length; colorIndex++) {
-		for(let levelIndex = 0; levelIndex < colorArray[colorIndex].length; levelIndex++) {
-			let finalColor = colorArray[colorIndex][levelIndex];
+	for(let i = 0; i < colorArray.length; i++) {
+		let finalColor = colorArray[i].hex;
+		let levelIndex = i % document.getElementById('num_l').value;
+		let colorIndex = Math.floor(i / document.getElementById('num_l').value);
 
-			var swatch = document.createElement('div');
-			swatch.style.background = finalColor;
-			swatch.title = finalColor;
-			swatch.addEventListener('click', () => {
-				navigator.clipboard.writeText(finalColor);
-			});
-			swatch.style.gridRow = document.getElementById('num_l').value - levelIndex; // flip
-			swatch.style.gridColumn = colorIndex + 1;
-			swatches.appendChild(swatch);
-		}
+		var swatch = document.createElement('div');
+		swatch.style.background = finalColor;
+		swatch.title = finalColor;
+		swatch.addEventListener('click', () => {
+			navigator.clipboard.writeText(finalColor);
+		});
+		swatch.style.gridRow = levelIndex + 1;
+		swatch.style.gridColumn = colorIndex + 1;
+		swatches.appendChild(swatch);
 	}
 }
 

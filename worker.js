@@ -21,31 +21,35 @@ function maxChroma(lightness, hue, min, max) {
 	}
 }
 
-// the progress mask is just a quick flash now
-// could stop sending progress updates
-// should store max chroma, unless chroma slider changes
+// should skip to the chroma step if only the chroma slider changes
+// also skip initializing shades if level slider didn't change
+// etc
 
 function run(config) {
-	let progress = 0;
-	let shift = Math.round((config.offset / 10) * ((360 / config.colors) / 2));
+	//let progress = 0;
+
+	let shadeStep = 100 / config.shades;
+	let colorsStep = 360 / config.colors;
+
+	let shift = Math.round((config.offset / 10) * (colorsStep / 2));
 
 	let palette = [];
 	let even = [];
+
 	let shades = [];
 	for (let i = 0; i < config.shades; i++) {
-		let step = 100 / config.shades;
-		shades[i] = Math.round(i * step + step / 2);
+		let invert = (config.shades - 1) - i;
+		shades[invert] = Math.round(i * shadeStep + shadeStep / 2);
+		even[invert] = 100;
 	}
+
 	let colors = [];
 	for (let i = 0; i < config.colors; i++) {
-		let step = 360 / config.colors;
-		colors[i] = Math.round(i * step + step / 2 + shift);
+		colors[i] = Math.round(i * colorsStep + colorsStep / 2 + shift);
 	}
 
-	for (let l = 0; l < shades.length; l++) {
-		even[l] = 100;
-
-		for (let h = 0; h < colors.length; h++) {
+	for (let h = 0; h < config.colors; h++) {
+		for (let l = 0; l < config.shades; l++) {
 			let max = maxChroma(shades[l], colors[h]);
 			if(max < even[l]) {
 				even[l] = max;
@@ -54,45 +58,36 @@ function run(config) {
 				l: shades[l],
 				c: max,
 				h: colors[h],
-				li: l,
-				hi: h
+				li: l
 			});
 		}
 
-		progress = progress + 1;
-		postMessage(progress / 100);
+		// no longer even accurate - it would not be 100 steps
+		//progress = progress + 1;
+		//postMessage(progress / 100);
 	}
 
-	for (let i = 0; i < palette.length; i++) {
-		palette[i].hex = chroma.lch(palette[i].l, even[palette[i].li], palette[i].h).hex();
-	}
-
-	//return { palette: palette, even: even };
-
-	// old getColors format
-	let colorArray = [];
+	// apply the even chroma
 	for (let i = 0; i < palette.length; i++) {
 		let item = palette[i];
-
 		let maxData = even[item.li];
-
 		let adjustedChroma = maxData + (item.c - maxData) * (config.chroma / 10);
-		let finalColor = chroma.lch(item.l, adjustedChroma, item.h).hex();
 
-		if(!colorArray[item.hi]) {
-			colorArray[item.hi] = [];
-		}
-		colorArray[item.hi][item.li] = finalColor;
+		palette[i].hex = chroma.lch(item.l, adjustedChroma, item.h).hex();
+	}
+	
+	// add gray at the front
+	for (let l = config.shades - 1; l >= 0; l--) {
+		palette.unshift({
+			l: shades[l],
+			c: 0,
+			h: 0,
+			li: l,
+			hex: chroma.lch(shades[l], 0, 0).hex() // could make it slightly blue
+		});
 	}
 
-	// add gray
-	colorArray.unshift([]);
-	for (let i = 0; i < shades.length; i++) {
-		let finalColor = chroma.lch(shades[i], 0, 0).hex(); // or change hue to blue
-		colorArray[0][i] = finalColor;
-	}
-
-	return colorArray;
+	return palette;
 }
 
 self.addEventListener("message", function(e) {
@@ -100,6 +95,7 @@ self.addEventListener("message", function(e) {
 
 	postMessage({
 		success: true,
-		calc: calc
+		calc: calc,
+		config: e.data // not used yet but could be instead of ducument values
 	});
 });
