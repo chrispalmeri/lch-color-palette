@@ -16,6 +16,7 @@ label {
 }
 #swatches {
 	display: grid;
+	background: #bbb;
 }
 #swatches > * {
 	height: 100%;
