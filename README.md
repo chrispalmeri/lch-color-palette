@@ -11,13 +11,7 @@ to old version, but should look similar visually, other than 1% brighter overall
 
 ## to do
 
-  * continue refactoring worker
-    * loops optimization
-    * cache config and smart update
   * use request animation frame
-
-## later
-
   * some kind of css color names matchup
   * horizontal swatch layout, with gaps, vertically scrollable?
   * move sidebar to left side?

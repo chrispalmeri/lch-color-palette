@@ -1,63 +1,93 @@
 importScripts('vendor/chroma.js'); // FF has no 'import' still
 
-function maxChroma(lightness, hue, min, max) {
-	let unclipped = min || 0;
-	let clipped = max || 100;
-	let options = clipped - unclipped;
-
-	if (options > 1) {
-		let testChroma = Math.round((clipped + unclipped) / 2);
-		let color = chroma.lch(lightness, testChroma, hue);
+function maxChroma(lightness, hue, min = 0, max = 100) {
+	if (max - min > 1) {
+		let test = Math.round((max + min) / 2);
+		let color = chroma.lch(lightness, test, hue);
 
 		if (color.clipped()) {
-			clipped = testChroma;
+			max = test;
 		} else {
-			unclipped = testChroma;
+			min = test;
 		}
 
-		return maxChroma(lightness, hue, unclipped, clipped);
+		return maxChroma(lightness, hue, min, max);
 	} else {
-		return unclipped;
+		return min;
 	}
 }
 
-// should skip to the chroma step if only the chroma slider changes
-// also skip initializing levels if level slider didn't change
-// etc
-// maybe make config global for comparison
+let cache = {
+	colors: null,
+	levels: null,
+	chroma: null,
+	offset: null
+};
 
-function run(config) {
-	let levelStep = 100 / config.levels;
-	let colorsStep = 360 / config.colors;
+let state = {
+	colors: [],
+	levels: [],
+	even: [],
+	palette: [],
+};
 
-	let shift = Math.round((config.offset / 10) * (colorsStep / 2));
-
-	let palette = [];
-	let even = [];
-
-	let levels = [];
-	for (let i = 0; i < config.levels; i++) {
-		let invert = config.levels - 1 - i;
-		levels[invert] = Math.round(i * levelStep + levelStep / 2);
-		even[invert] = 100;
+function run(input) {
+	let changed = {};
+	for (var key in cache) {
+		if (cache[key] !== input[key]) {
+			changed[key] = true;
+			cache[key] = input[key];
+		}
 	}
 
-	let colors = [];
-	for (let i = 0; i < config.colors; i++) {
-		colors[i] = Math.round(i * colorsStep + colorsStep / 2 + shift);
+	if (changed.colors || changed.offset) {
+		// init colors
+		state.colors = [];
+		let colorStep = 360 / input.colors;
+		let colorShift = Math.round((input.offset / 10) * (colorStep / 2));
+		for (let i = 0; i < input.colors; i++) {
+			state.colors[i] = Math.round(i * colorStep + colorStep / 2 + colorShift);
+		}
 	}
 
-	for (let h = 0; h < config.colors; h++) {
-		for (let l = 0; l < config.levels; l++) {
-			let max = maxChroma(levels[l], colors[h]);
-			if (max < even[l]) {
-				even[l] = max;
+	if (changed.levels) {
+		// init levels and even
+		state.levels = [];
+		state.even = [];
+		let levelStep = 100 / input.levels;
+		for (let i = 0; i < input.levels; i++) {
+			let invert = input.levels - 1 - i;
+			state.levels[invert] = Math.round(i * levelStep + levelStep / 2);
+			state.even[invert] = 100;
+		}
+	}
+
+	if (changed.colors || changed.levels || changed.offset) {
+		// init palette and get even chroma per level
+		state.palette = [];
+		for (let h = 0; h < input.colors; h++) {
+			for (let l = 0; l < input.levels; l++) {
+				let max = maxChroma(state.levels[l], state.colors[h]);
+				if (max < state.even[l]) {
+					state.even[l] = max;
+				}
+				state.palette.push({
+					l: state.levels[l],
+					c: max,
+					h: state.colors[h],
+					li: l
+				});
 			}
-			palette.push({
-				l: levels[l],
-				c: max,
-				h: colors[h],
-				li: l
+		}
+
+		// add gray at the front
+		for (let l = input.levels - 1; l >= 0; l--) {
+			state.palette.unshift({
+				l: state.levels[l],
+				c: 0,
+				h: 0,
+				li: l,
+				hex: chroma.lch(state.levels[l], 0, 0).hex() // could make it slightly blue
 			});
 		}
 	}
@@ -66,34 +96,23 @@ function run(config) {
 	// could over chroma bias to bumping dark colors?
 	// or can chroma be bumped more evenly, ignoring clipping?
 
-	// apply the even chroma
-	for (let i = 0; i < palette.length; i++) {
-		let item = palette[i];
-		let maxData = even[item.li];
-		let adjustedChroma = maxData + (item.c - maxData) * (config.chroma / 10);
+	if (changed.colors || changed.levels || changed.chroma || changed.offset) {
+		// add hex using the adjusted chroma, skip gray
+		for (let i = input.levels; i < state.palette.length; i++) {
+			let maxData = state.even[state.palette[i].li];
+			let adjustedChroma = maxData + (state.palette[i].c - maxData) * (input.chroma / 10);
 
-		palette[i].hex = chroma.lch(item.l, adjustedChroma, item.h).hex();
+			state.palette[i].hex = chroma.lch(state.palette[i].l, adjustedChroma, state.palette[i].h).hex();
+		}
 	}
 
-	// add gray at the front
-	for (let l = config.levels - 1; l >= 0; l--) {
-		palette.unshift({
-			l: levels[l],
-			c: 0,
-			h: 0,
-			li: l,
-			hex: chroma.lch(levels[l], 0, 0).hex() // could make it slightly blue
-		});
-	}
-
-	return palette;
+	return {
+		colors: state.palette,
+		config: input
+	};
 }
 
-self.addEventListener('message', function (e) {
-	let calc = run(e.data);
-
-	postMessage({
-		colors: calc,
-		config: e.data
-	});
+self.addEventListener('message', function (event) {
+	let result = run(event.data);
+	postMessage(result);
 });
