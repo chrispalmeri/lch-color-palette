@@ -23,7 +23,7 @@ to old version, but should look similar visually, other than 1% brighter overall
   * horizontal swatch layout, with gaps, vertically scrollable?
   * ability to turn down chroma, or up more evenly ignoring clipping?
   * type module
-  * favicon and stuff
+  * general metadata stuff
   * move to unrowdy and netlify if nice enough
 
 # local web sever
