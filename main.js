@@ -12,7 +12,7 @@ function downloadCss(e) {
 		for(let levelIndex = 0; levelIndex < colorArray[colorIndex].length; levelIndex++) {
 			let finalColor = colorArray[colorIndex][levelIndex];
 
-			styleSheet.cssRules[0].style.setProperty(`--color${colorIndex + 1}-${100 * (levelIndex + 1)}`, finalColor);
+			styleSheet.cssRules[0].style.setProperty(`--color${colorIndex}-${100 * (levelIndex + 1)}`, finalColor);
 		}
 	}
 
@@ -39,7 +39,7 @@ function showColors() {
 			swatch.addEventListener('click', () => {
 				navigator.clipboard.writeText(finalColor);
 			});
-			swatch.style.gridRow = levelIndex + 1;
+			swatch.style.gridRow = document.getElementById('num_l').value - levelIndex; // flip
 			swatch.style.gridColumn = colorIndex + 1;
 			swatches.appendChild(swatch);
 		}
@@ -68,7 +68,7 @@ function startWorker() {
 
 	myWorker.postMessage({
 		colors: document.getElementById('num_h').value,
-		levels: document.getElementById('num_l').value,
+		shades: document.getElementById('num_l').value,
 		chroma: document.getElementById('num_c').value,
 		offset: document.getElementById('off_x').value
 	});

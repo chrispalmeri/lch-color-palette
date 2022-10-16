@@ -21,66 +21,41 @@ function maxChroma(lightness, hue, min, max) {
 	}
 }
 
-function getColors(workerOutput, numberOfColors, numberOfLevels, percentOverChroma, hueOffset) {
-	let colorArray = [];
+// the progress mask is just a quick flash now
+// could stop sending progress updates
+// should store max chroma, unless chroma slider changes
 
-	let shift = Math.round((hueOffset / 10) * ((360 / numberOfColors) / 2)); // convert hueOffset to edge extents at max
-
-	for(let colorIndex = 0; colorIndex < numberOfColors; colorIndex++) {
-		colorArray[colorIndex] = [];
-
-		for(let levelIndex = 0; levelIndex < numberOfLevels; levelIndex++) {
-			let lightness = Math.round((levelIndex * (100 / numberOfLevels)) + ((100 / numberOfLevels) / 2));
-			let hue = Math.round((colorIndex * (360 / numberOfColors)) + ((360 / numberOfColors) / 2) + shift);
-
-			lightness = 99 - lightness; // this is what flips it
-
-			// these are weird, just to match current behavior
-			let colorData = workerOutput.palette[(lightness + 1) * 360 + (hue - 1)];
-			let maxData = workerOutput.even[lightness + 1];
-
-			let adjustedChroma = maxData + (colorData.c - maxData) * (percentOverChroma / 10);
-			let finalColor = chroma.lch(lightness, adjustedChroma, hue).hex();
-
-			colorArray[colorIndex][levelIndex] = finalColor;
-		}
-	}
-
-	// add gray
-	colorArray.unshift([]);
-
-	for(let levelIndex = 0; levelIndex < numberOfLevels; levelIndex++) {
-		let lightness = Math.round((levelIndex * (100 / numberOfLevels)) + ((100 / numberOfLevels) / 2));
-		lightness = 99 - lightness; // this is what flips it
-
-		let finalColor = chroma.lch(lightness, 0, 0).hex(); // or change hue to blue
-
-		colorArray[0][levelIndex] = finalColor;
-	}
-
-	return colorArray;
-}
-
-function run() {
+function run(config) {
 	let progress = 0;
+	let shift = Math.round((config.offset / 10) * ((360 / config.colors) / 2));
 
 	let palette = [];
 	let even = [];
-	let shades = Array.from({length: 100}, (v, i) => i);
-	let colors = Array.from({length: 360}, (v, i) => i);
+	let shades = [];
+	for (let i = 0; i < config.shades; i++) {
+		let step = 100 / config.shades;
+		shades[i] = Math.round(i * step + step / 2);
+	}
+	let colors = [];
+	for (let i = 0; i < config.colors; i++) {
+		let step = 360 / config.colors;
+		colors[i] = Math.round(i * step + step / 2 + shift);
+	}
 
 	for (let l = 0; l < shades.length; l++) {
 		even[l] = 100;
 
 		for (let h = 0; h < colors.length; h++) {
-			let max = maxChroma(l, h);
+			let max = maxChroma(shades[l], colors[h]);
 			if(max < even[l]) {
 				even[l] = max;
 			}
 			palette.push({
-				l: l,
+				l: shades[l],
 				c: max,
-				h: h,
+				h: colors[h],
+				li: l,
+				hi: h
 			});
 		}
 
@@ -89,24 +64,39 @@ function run() {
 	}
 
 	for (let i = 0; i < palette.length; i++) {
-		palette[i].hex = chroma.lch(palette[i].l, even[palette[i].l], palette[i].h).hex();
+		palette[i].hex = chroma.lch(palette[i].l, even[palette[i].li], palette[i].h).hex();
 	}
 
-	return { palette: palette, even: even };
+	//return { palette: palette, even: even };
+
+	// old getColors format
+	let colorArray = [];
+	for (let i = 0; i < palette.length; i++) {
+		let item = palette[i];
+
+		let maxData = even[item.li];
+
+		let adjustedChroma = maxData + (item.c - maxData) * (config.chroma / 10);
+		let finalColor = chroma.lch(item.l, adjustedChroma, item.h).hex();
+
+		if(!colorArray[item.hi]) {
+			colorArray[item.hi] = [];
+		}
+		colorArray[item.hi][item.li] = finalColor;
+	}
+
+	// add gray
+	colorArray.unshift([]);
+	for (let i = 0; i < shades.length; i++) {
+		let finalColor = chroma.lch(shades[i], 0, 0).hex(); // or change hue to blue
+		colorArray[0][i] = finalColor;
+	}
+
+	return colorArray;
 }
 
-// the progress mask is immersion breaking
-// not really a fix, just keeping old behavior, by only doing it once
-// that should be the only thing sending progress updates, so no mask
-// if you stop this, still store max chroma, unless chroma slider changes
-let out = null;
-
 self.addEventListener("message", function(e) {
-	if(!out) {
-		out = run();
-	}
-
-	let calc = getColors(out, e.data.colors, e.data.levels, e.data.chroma, e.data.offset);
+	let calc = run(e.data);
 
 	postMessage({
 		success: true,
