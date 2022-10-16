@@ -1,4 +1,18 @@
+// import './vendor/chroma.js';
+
 let myWorker, colorArray;
+
+// some function to retrieve closest names based on hue
+// and maybe combine them for in between
+// you should make a longer list, these are the main six
+/*let names = [
+	'red',
+	'yellow',
+	'green',
+	'cyan',
+	'blue',
+	'magenta'
+];*/
 
 function downloadCss(e) {
 	e.preventDefault();

@@ -24,6 +24,7 @@ function maxChroma(lightness, hue, min, max) {
 // should skip to the chroma step if only the chroma slider changes
 // also skip initializing shades if level slider didn't change
 // etc
+// maybe make config global for comparison
 
 function run(config) {
 	let shadeStep = 100 / config.shades;
@@ -60,6 +61,10 @@ function run(config) {
 			});
 		}
 	}
+
+	// should you curve light colors down toward overall average chroma?
+	// could over chroma bias to bumping dark colors?
+	// or can chroma be bumped more evenly, ignoring clipping?
 
 	// apply the even chroma
 	for (let i = 0; i < palette.length; i++) {
