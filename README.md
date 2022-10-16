@@ -12,11 +12,10 @@ to old version, but should look similar visually, other than 1% brighter overall
 ## to do
 
   * add a comment to the css with link and config used
-  * refactor worker now that it is all in the same place
-    * change format of returned data
-    * so many loops
-    * also some constants can move out of loops
-    * if fast enough, no progress
+  * continue refactoring worker
+    * format of returned data
+    * loops optimization
+  * use request animation frame
 
 ## later
 

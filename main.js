@@ -49,18 +49,8 @@ function startWorker() {
 		myWorker = new Worker("worker.js");
 
 		myWorker.onmessage = function(event) {
-			var progressBar = document.getElementById('progress');
-
-			if(event.data.success) {
-				progressBar.parentElement.style.display = 'none';
-				progressBar.value = 0;
-
-				colorArray = event.data.calc;
-				showColors();
-			} else {
-				progressBar.parentElement.style.display = 'flex';
-				progressBar.value = event.data;
-			}
+			colorArray = event.data.calc;
+			showColors();
 		};
 	}
 

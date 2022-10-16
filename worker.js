@@ -26,8 +26,6 @@ function maxChroma(lightness, hue, min, max) {
 // etc
 
 function run(config) {
-	//let progress = 0;
-
 	let shadeStep = 100 / config.shades;
 	let colorsStep = 360 / config.colors;
 
@@ -61,10 +59,6 @@ function run(config) {
 				li: l
 			});
 		}
-
-		// no longer even accurate - it would not be 100 steps
-		//progress = progress + 1;
-		//postMessage(progress / 100);
 	}
 
 	// apply the even chroma
@@ -94,7 +88,6 @@ self.addEventListener("message", function(e) {
 	let calc = run(e.data);
 
 	postMessage({
-		success: true,
 		calc: calc,
 		config: e.data // not used yet but could be instead of ducument values
 	});
