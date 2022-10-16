@@ -11,10 +11,9 @@ to old version, but should look similar visually, other than 1% brighter overall
 
 ## to do
 
-  * add a comment to the css with link and config used
   * continue refactoring worker
-    * format of returned data
     * loops optimization
+    * cache config and smart update
   * use request animation frame
 
 ## later

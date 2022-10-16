@@ -22,12 +22,12 @@ function maxChroma(lightness, hue, min, max) {
 }
 
 // should skip to the chroma step if only the chroma slider changes
-// also skip initializing shades if level slider didn't change
+// also skip initializing levels if level slider didn't change
 // etc
 // maybe make config global for comparison
 
 function run(config) {
-	let shadeStep = 100 / config.shades;
+	let levelStep = 100 / config.levels;
 	let colorsStep = 360 / config.colors;
 
 	let shift = Math.round((config.offset / 10) * (colorsStep / 2));
@@ -35,10 +35,10 @@ function run(config) {
 	let palette = [];
 	let even = [];
 
-	let shades = [];
-	for (let i = 0; i < config.shades; i++) {
-		let invert = (config.shades - 1) - i;
-		shades[invert] = Math.round(i * shadeStep + shadeStep / 2);
+	let levels = [];
+	for (let i = 0; i < config.levels; i++) {
+		let invert = (config.levels - 1) - i;
+		levels[invert] = Math.round(i * levelStep + levelStep / 2);
 		even[invert] = 100;
 	}
 
@@ -48,13 +48,13 @@ function run(config) {
 	}
 
 	for (let h = 0; h < config.colors; h++) {
-		for (let l = 0; l < config.shades; l++) {
-			let max = maxChroma(shades[l], colors[h]);
+		for (let l = 0; l < config.levels; l++) {
+			let max = maxChroma(levels[l], colors[h]);
 			if(max < even[l]) {
 				even[l] = max;
 			}
 			palette.push({
-				l: shades[l],
+				l: levels[l],
 				c: max,
 				h: colors[h],
 				li: l
@@ -76,13 +76,13 @@ function run(config) {
 	}
 	
 	// add gray at the front
-	for (let l = config.shades - 1; l >= 0; l--) {
+	for (let l = config.levels - 1; l >= 0; l--) {
 		palette.unshift({
-			l: shades[l],
+			l: levels[l],
 			c: 0,
 			h: 0,
 			li: l,
-			hex: chroma.lch(shades[l], 0, 0).hex() // could make it slightly blue
+			hex: chroma.lch(levels[l], 0, 0).hex() // could make it slightly blue
 		});
 	}
 
@@ -93,7 +93,7 @@ self.addEventListener("message", function(e) {
 	let calc = run(e.data);
 
 	postMessage({
-		calc: calc,
-		config: e.data // not used yet but could be instead of ducument values
+		colors: calc,
+		config: e.data
 	});
 });
