@@ -48,7 +48,9 @@ function showColors() {
 	let swatches = document.getElementById('swatches');
 	swatches.innerHTML = '';
 
-	for (let i = 0; i < workerData.colors.length; i++) {
+	// intentionally skips gray to be consistent with slider
+	// gray still included in css though
+	for (let i = workerData.config.levels; i < workerData.colors.length; i++) {
 		let finalColor = workerData.colors[i].hex;
 		let levelIndex = i % workerData.config.levels;
 		let colorIndex = Math.floor(i / workerData.config.levels);
@@ -60,7 +62,7 @@ function showColors() {
 			navigator.clipboard.writeText(finalColor);
 		});
 		swatch.style.gridRow = levelIndex + 1;
-		swatch.style.gridColumn = colorIndex + 1;
+		swatch.style.gridColumn = colorIndex;
 		swatches.appendChild(swatch);
 	}
 }
