@@ -1,46 +1,42 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="utf-8">
 		<title>LCH Color Palette</title>
 		<link rel="stylesheet" href="default.css">
-		<script src="vendor/chroma.js"></script>
+		<script type="module" src="main.js"></script>
 	</head>
 	<body>
-		<div class="main">
-			<div id="swatches"></div>
+		<div id="swatches"></div>
 
-			<div class="controls">
-				<h2>LCH Color Palette</h2>
-				<p>
-					<label># of Colors</label>
-					<input id="num_h" type="range" min="1" max="12" value="6">
-				</p>
-				<p>
-					<label># of Levels</label>
-					<input id="num_l" type="range" min="1" max="12" value="6">
-				</p>
-				<p>
-					<label>% over Chroma</label>
-					<input id="num_c" type="range" min="0" max="10" value="0">
-				</p>
-				<p>
-					<label>Hue Offset</label>
-					<input id="off_x" type="range" min="-10" max="10" value="0">
-				</p>
-				<p>
-					Adjust from even clipping to individual clipping for chroma.
-				</p>
-				<p>
-					Click on a color to copy the individual hex code.<br>
-					Or <a href="#downloadCss" id="download">download the css</a>.
-				</p>
-				<p>
-					Made using <a href="https://gka.github.io/chroma.js/" rel="noopener" target="_blank">chroma.js</a>.
-				</p>
-			</div>
-
+		<div class="controls">
+			<h2>LCH Color Palette</h2>
+			<p>
+				<label># of Colors</label>
+				<input id="num_h" type="range" min="1" max="12" value="6">
+			</p>
+			<p>
+				<label># of Levels</label>
+				<input id="num_l" type="range" min="1" max="12" value="6">
+			</p>
+			<p>
+				<label>% over Chroma</label>
+				<input id="num_c" type="range" min="0" max="10" value="0">
+			</p>
+			<p>
+				<label>Hue Offset</label>
+				<input id="off_x" type="range" min="-10" max="10" value="0">
+			</p>
+			<p>
+				Adjust from even clipping to individual clipping for chroma.
+			</p>
+			<p>
+				Click on a color to copy the individual hex code.<br>
+				Or <a href="#downloadCss" id="download">download the css</a>.
+			</p>
+			<p>
+				Made using <a href="https://gka.github.io/chroma.js/" rel="noopener" target="_blank">chroma.js</a>.
+			</p>
 		</div>
-		<script src="main.js"></script>
 	</body>
 </html>

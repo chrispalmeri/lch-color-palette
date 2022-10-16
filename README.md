@@ -11,12 +11,12 @@ to old version, but should look similar visually, other than 1% brighter overall
 
 ## to do
 
-  * use request animation frame
   * some kind of css color names matchup
+  * use request animation frame
+  * you might not _need_ to be using a worker anymore
   * horizontal swatch layout, with gaps, vertically scrollable?
   * move sidebar to left side?
   * ability to turn down chroma, or up more evenly ignoring clipping?
-  * type module
   * general metadata stuff
   * move to unrowdy and netlify if nice enough
 
