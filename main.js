@@ -34,21 +34,18 @@ function downloadCss(e) {
 
 	for (let i = 0; i < workerData.colors.length; i++) {
 		let finalColor = workerData.colors[i].hex;
+		let levelIndex = i % workerData.config.levels;
 
 		let colorName = 'gray';
 		if(workerData.colors[i].c !== 0) {
 			colorName = getColorName(workerData.colors[i].h);
 		}
 
-		// dunno, presumably this is the standard sort of scale
-		// could round to 50's, but didn't like the inconsistent sequence
-		// at least this is accurate
-		let colorNumber = Math.round(1000 - workerData.colors[i].l * 10);
-		// this was ok too, except if you later added levels, maybe
-		// colors in your project would change unexpectedley?
-		// let colorNumber = 100 * (levelIndex + 1);
+		// presumably this is the standard sort of scale, didn't like it
+		// could round to 50's, but didn't like that sequence either
+		// let colorNumber = Math.round(1000 - workerData.colors[i].l * 10);
 
-		styleSheet.cssRules[0].style.setProperty(`--${colorName}-${colorNumber}`, finalColor);
+		styleSheet.cssRules[0].style.setProperty(`--${colorName}-${levelIndex + 1}`, finalColor);
 	}
 
 	let cssText = styleSheet.cssRules[0].cssText;
@@ -82,15 +79,9 @@ function showColors() {
 		let levelIndex = i % workerData.config.levels;
 		let colorIndex = Math.floor(i / workerData.config.levels);
 
-		// mostly just for checking
-		let colorName = 'gray';
-		if(workerData.colors[i].c !== 0) {
-			colorName = getColorName(workerData.colors[i].h);
-		}
-
 		let swatch = document.createElement('div');
 		swatch.style.background = finalColor;
-		swatch.title = finalColor + ' (' + colorName + ')'; // checking
+		swatch.title = finalColor;
 		swatch.addEventListener('click', () => {
 			navigator.clipboard.writeText(finalColor);
 		});

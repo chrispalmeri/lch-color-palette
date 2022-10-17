@@ -13,6 +13,7 @@ label {
 }
 #swatches {
 	display: grid;
+	grid-auto-columns: 1fr;
 	background: #bbb;
 }
 #swatches > * {

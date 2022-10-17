@@ -6,6 +6,7 @@ https://chrispalmeri.github.io/lch-color-palette/
 
 ## to do
 
+  * could move names into worker, maybe even row/column numbers
   * use request animation frame
   * you might not _need_ to be using a worker anymore
   * horizontal swatch layout, with gaps, vertically scrollable?
