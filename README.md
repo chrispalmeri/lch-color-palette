@@ -4,14 +4,8 @@ Generate equidistant color palettes
 
 https://chrispalmeri.github.io/lch-color-palette/
 
-## notes
-
-used to have a bug I think, roughly lightness -1, so colors will not match exactly
-to old version, but should look similar visually, other than 1% brighter overall
-
 ## to do
 
-  * some kind of css color names matchup
   * use request animation frame
   * you might not _need_ to be using a worker anymore
   * horizontal swatch layout, with gaps, vertically scrollable?

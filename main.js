@@ -2,17 +2,29 @@
 
 let myWorker, workerData;
 
-// some function to retrieve closest names based on hue
-// and maybe combine them for in between
-// you should make a longer list, these are the main six
-/*let names = [
-	'red',
-	'yellow',
-	'green',
-	'cyan',
-	'blue',
-	'magenta'
-];*/
+function getColorName(input) {
+	let names = [
+		'red',
+		'orange',
+		'yellow',
+		'lime',
+		'green',
+		'emerald',
+		'cyan',
+		'indigo',
+		'blue',
+		'purple',
+		'magenta',
+		'pink'
+	];
+
+	// input is 0-360 inclusive
+	input = input - 10; // to adjust when they switch, maybe not perfect (also avoids > 359)
+	if (input < 0) input += 360; // wrap around
+	let index = Math.floor(input / 30);
+
+	return names[index];
+}
 
 function downloadCss(e) {
 	e.preventDefault();
@@ -22,10 +34,21 @@ function downloadCss(e) {
 
 	for (let i = 0; i < workerData.colors.length; i++) {
 		let finalColor = workerData.colors[i].hex;
-		let levelIndex = i % workerData.config.levels;
-		let colorIndex = Math.floor(i / workerData.config.levels);
 
-		styleSheet.cssRules[0].style.setProperty(`--color${colorIndex}-${100 * (levelIndex + 1)}`, finalColor);
+		let colorName = 'gray';
+		if(workerData.colors[i].c !== 0) {
+			colorName = getColorName(workerData.colors[i].h);
+		}
+
+		// dunno, presumably this is the standard sort of scale
+		// could round to 50's, but didn't like the inconsistent sequence
+		// at least this is accurate
+		let colorNumber = Math.round(1000 - workerData.colors[i].l * 10);
+		// this was ok too, except if you later added levels, maybe
+		// colors in your project would change unexpectedley?
+		// let colorNumber = 100 * (levelIndex + 1);
+
+		styleSheet.cssRules[0].style.setProperty(`--${colorName}-${colorNumber}`, finalColor);
 	}
 
 	let cssText = styleSheet.cssRules[0].cssText;
@@ -38,6 +61,9 @@ function downloadCss(e) {
 	comment += ' * offset: ' + workerData.config.offset + '\n';
 	comment += ' */\n\n';
 
+	// if you wanted to prepareCss immediately everytime after showColors
+	// then you could just set these attributes on the real link
+	// instead of creating a fake one, and then don't prevent default
 	let link = document.createElement('a');
 	link.setAttribute('href', 'data:text/css;charset=utf-8,' + encodeURIComponent(comment + cssFormatted));
 	link.setAttribute('download', 'colors.css');
@@ -52,12 +78,19 @@ function showColors() {
 	// gray still included in css though
 	for (let i = workerData.config.levels; i < workerData.colors.length; i++) {
 		let finalColor = workerData.colors[i].hex;
+		// you could include more indexes from the worker, if it helps with this
 		let levelIndex = i % workerData.config.levels;
 		let colorIndex = Math.floor(i / workerData.config.levels);
 
+		// mostly just for checking
+		let colorName = 'gray';
+		if(workerData.colors[i].c !== 0) {
+			colorName = getColorName(workerData.colors[i].h);
+		}
+
 		let swatch = document.createElement('div');
 		swatch.style.background = finalColor;
-		swatch.title = finalColor;
+		swatch.title = finalColor + ' (' + colorName + ')'; // checking
 		swatch.addEventListener('click', () => {
 			navigator.clipboard.writeText(finalColor);
 		});
@@ -74,6 +107,7 @@ function startWorker() {
 		myWorker.addEventListener('message', function (event) {
 			workerData = event.data;
 			showColors();
+			// not terminating the worker in this case since it will be reused
 		});
 	}
 
