@@ -1,8 +1,14 @@
 importScripts('vendor/chroma.js'); // FF has no 'import' still
 
-function maxChroma(lightness, hue, min = 0, max = 100) {
-	if (max - min > 1) {
-		let test = Math.round((max + min) / 2);
+function round(number, decimal = 2) {
+	var magnitude = Math.pow(10, decimal);
+	return Math.round(number * magnitude) / magnitude;
+}
+
+// absolute max seen was 133.52 at 100x360 plus running through offset
+function maxChroma(lightness, hue, min = 0, max = 163.84) {
+	if (max - min > 0.01) {
+		let test = (max + min) / 2;
 		let color = chroma.lch(lightness, test, hue);
 
 		if (color.clipped()) {
@@ -13,7 +19,7 @@ function maxChroma(lightness, hue, min = 0, max = 100) {
 
 		return maxChroma(lightness, hue, min, max);
 	} else {
-		return min;
+		return round(min);
 	}
 }
 
@@ -44,9 +50,9 @@ function run(input) {
 		// init colors
 		state.colors = [];
 		let colorStep = 360 / input.colors;
-		let colorShift = Math.round((input.offset / 10) * (colorStep / 2));
+		let colorShift = (input.offset / 10) * (colorStep / 2);
 		for (let i = 0; i < input.colors; i++) {
-			state.colors[i] = Math.round(i * colorStep + colorStep / 2 + colorShift);
+			state.colors[i] = round(i * colorStep + colorStep / 2 + colorShift);
 		}
 	}
 
@@ -57,7 +63,7 @@ function run(input) {
 		let levelStep = 100 / input.levels;
 		for (let i = 0; i < input.levels; i++) {
 			let invert = input.levels - 1 - i;
-			state.levels[invert] = Math.round(i * levelStep + levelStep / 2);
+			state.levels[invert] = round(i * levelStep + levelStep / 2);
 			state.even[invert] = 100;
 		}
 	}
